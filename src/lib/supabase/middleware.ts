@@ -1,6 +1,9 @@
 import { createServerClient } from "@supabase/ssr";
 import { NextResponse, type NextRequest } from "next/server";
 
+const publicRoutes = ["/", "/auth/confirm", "/auth/signout"];
+const authRoutes = ["/login", "/signup", "/forgot-password"];
+
 export async function updateSession(request: NextRequest) {
   let supabaseResponse = NextResponse.next({
     request,
@@ -30,7 +33,33 @@ export async function updateSession(request: NextRequest) {
   );
 
   // Refresh the session — important for Server Components
-  await supabase.auth.getUser();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+
+  const pathname = request.nextUrl.pathname;
+
+  // Public routes — always accessible
+  if (publicRoutes.includes(pathname) || pathname.startsWith("/auth/")) {
+    return supabaseResponse;
+  }
+
+  // Auth routes — redirect to dashboard if already logged in
+  if (authRoutes.includes(pathname)) {
+    if (user) {
+      const url = request.nextUrl.clone();
+      url.pathname = "/dashboard";
+      return NextResponse.redirect(url);
+    }
+    return supabaseResponse;
+  }
+
+  // Protected routes — redirect to login if not authenticated
+  if (!user) {
+    const url = request.nextUrl.clone();
+    url.pathname = "/login";
+    return NextResponse.redirect(url);
+  }
 
   return supabaseResponse;
 }
