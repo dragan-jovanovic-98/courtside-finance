@@ -1,6 +1,7 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useMemo, useState, useCallback } from "react";
+import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
@@ -20,14 +21,7 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import {
-  Phone,
-  PhoneIncoming,
-  PhoneOutgoing,
-  Search,
-  X,
-  Play,
-} from "lucide-react";
+import { Phone, Search, X } from "lucide-react";
 
 type Call = {
   id: string;
@@ -39,6 +33,7 @@ type Call = {
   summary: string | null;
   recording_url: string | null;
   started_at: string | null;
+  outcome: string[] | null;
   contacts: { first_name: string | null; last_name: string | null; phone: string | null } | null;
   voice_agents: { name: string } | null;
 };
@@ -79,6 +74,7 @@ export function CallsClient({
   calls: Call[];
   agents: Agent[];
 }) {
+  const router = useRouter();
   const [search, setSearch] = useState("");
   const [statusFilter, setStatusFilter] = useState("all");
   const [directionFilter, setDirectionFilter] = useState("all");
@@ -87,7 +83,6 @@ export function CallsClient({
 
   const filtered = useMemo(() => {
     return calls.filter((call) => {
-      // Search
       if (search) {
         const q = search.toLowerCase();
         const contactName = call.contacts
@@ -96,11 +91,8 @@ export function CallsClient({
         const phone = (call.from_number ?? "") + (call.to_number ?? "");
         if (!contactName.includes(q) && !phone.includes(q)) return false;
       }
-      // Status
       if (statusFilter !== "all" && call.status !== statusFilter) return false;
-      // Direction
       if (directionFilter !== "all" && call.direction !== directionFilter) return false;
-      // Agent
       if (agentFilter !== "all") {
         const agentName = (call.voice_agents as unknown as { name: string } | null)?.name;
         if (agentName !== agentFilter) return false;
@@ -204,13 +196,11 @@ export function CallsClient({
             <Table>
               <TableHeader>
                 <TableRow>
-                  <TableHead className="w-10"></TableHead>
-                  <TableHead>Contact</TableHead>
-                  <TableHead>Agent</TableHead>
-                  <TableHead>Status</TableHead>
+                  <TableHead>Lead</TableHead>
                   <TableHead>Duration</TableHead>
-                  <TableHead className="w-10"></TableHead>
-                  <TableHead>Date</TableHead>
+                  <TableHead>Status</TableHead>
+                  <TableHead>Outcome</TableHead>
+                  <TableHead>Date Called</TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>
@@ -220,7 +210,6 @@ export function CallsClient({
                     last_name: string | null;
                     phone: string | null;
                   } | null;
-                  const agent = call.voice_agents as unknown as { name: string } | null;
                   const contactName = contact
                     ? `${contact.first_name ?? ""} ${contact.last_name ?? ""}`.trim()
                     : null;
@@ -230,14 +219,7 @@ export function CallsClient({
                     "Unknown";
 
                   return (
-                    <TableRow key={call.id} className="cursor-pointer hover:bg-muted/50">
-                      <TableCell>
-                        {call.direction === "inbound" ? (
-                          <PhoneIncoming className="size-4 text-blue-500" />
-                        ) : (
-                          <PhoneOutgoing className="size-4 text-green-500" />
-                        )}
-                      </TableCell>
+                    <TableRow key={call.id} className="cursor-pointer hover:bg-muted/50" onClick={() => router.push(`/calls/${call.id}`)}>
                       <TableCell>
                         <Link
                           href={`/calls/${call.id}`}
@@ -252,34 +234,30 @@ export function CallsClient({
                         )}
                       </TableCell>
                       <TableCell className="text-sm">
-                        {agent?.name ?? "—"}
+                        {call.duration_seconds != null && call.duration_seconds > 0
+                          ? formatDuration(call.duration_seconds)
+                          : "---"}
                       </TableCell>
                       <TableCell>
                         <Badge variant={statusVariant[call.status] ?? "outline"}>
                           {call.status.replace("_", " ")}
                         </Badge>
                       </TableCell>
-                      <TableCell className="text-sm">
-                        {call.duration_seconds != null && call.duration_seconds > 0
-                          ? formatDuration(call.duration_seconds)
-                          : "—"}
-                      </TableCell>
                       <TableCell>
-                        {call.recording_url && (
-                          <a
-                            href={call.recording_url}
-                            target="_blank"
-                            rel="noopener noreferrer"
-                            onClick={(e) => e.stopPropagation()}
-                            className="inline-flex items-center justify-center rounded-md p-1 text-muted-foreground hover:text-foreground hover:bg-muted transition-colors"
-                            title="Play recording"
-                          >
-                            <Play className="size-4" />
-                          </a>
+                        {call.outcome && call.outcome.length > 0 ? (
+                          <div className="flex flex-wrap gap-1">
+                            {call.outcome.map((o) => (
+                              <Badge key={o} variant="outline" className="text-xs">
+                                {o.replace("_", " ")}
+                              </Badge>
+                            ))}
+                          </div>
+                        ) : (
+                          <span className="text-sm text-muted-foreground">---</span>
                         )}
                       </TableCell>
                       <TableCell className="text-sm text-muted-foreground">
-                        {call.started_at ? formatDate(call.started_at) : "—"}
+                        {call.started_at ? formatDate(call.started_at) : "---"}
                       </TableCell>
                     </TableRow>
                   );

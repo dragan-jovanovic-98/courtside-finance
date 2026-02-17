@@ -23,11 +23,13 @@ export type Database = {
           created_at: string
           direction: Database["public"]["Enums"]["call_direction"]
           disconnection_reason: string | null
+          disposition: string[] | null
           duration_seconds: number | null
           ended_at: string | null
           from_number: string | null
           id: string
           organization_id: string | null
+          outcome: string[] | null
           recording_url: string | null
           retell_call_id: string | null
           sentiment: string | null
@@ -47,11 +49,13 @@ export type Database = {
           created_at?: string
           direction: Database["public"]["Enums"]["call_direction"]
           disconnection_reason?: string | null
+          disposition?: string[] | null
           duration_seconds?: number | null
           ended_at?: string | null
           from_number?: string | null
           id?: string
           organization_id?: string | null
+          outcome?: string[] | null
           recording_url?: string | null
           retell_call_id?: string | null
           sentiment?: string | null
@@ -71,11 +75,13 @@ export type Database = {
           created_at?: string
           direction?: Database["public"]["Enums"]["call_direction"]
           disconnection_reason?: string | null
+          disposition?: string[] | null
           duration_seconds?: number | null
           ended_at?: string | null
           from_number?: string | null
           id?: string
           organization_id?: string | null
+          outcome?: string[] | null
           recording_url?: string | null
           retell_call_id?: string | null
           sentiment?: string | null
@@ -120,6 +126,7 @@ export type Database = {
       }
       campaign_contacts: {
         Row: {
+          attempt_count: number
           call_id: string | null
           call_status: Database["public"]["Enums"]["campaign_contact_status"]
           campaign_id: string
@@ -130,6 +137,7 @@ export type Database = {
           updated_at: string
         }
         Insert: {
+          attempt_count?: number
           call_id?: string | null
           call_status?: Database["public"]["Enums"]["campaign_contact_status"]
           campaign_id: string
@@ -140,6 +148,7 @@ export type Database = {
           updated_at?: string
         }
         Update: {
+          attempt_count?: number
           call_id?: string | null
           call_status?: Database["public"]["Enums"]["campaign_contact_status"]
           campaign_id?: string
@@ -184,6 +193,7 @@ export type Database = {
           daily_cap: number | null
           description: string | null
           id: string
+          max_attempts: number
           max_concurrent_calls: number | null
           name: string
           organization_id: string | null
@@ -205,6 +215,7 @@ export type Database = {
           daily_cap?: number | null
           description?: string | null
           id?: string
+          max_attempts?: number
           max_concurrent_calls?: number | null
           name: string
           organization_id?: string | null
@@ -226,6 +237,7 @@ export type Database = {
           daily_cap?: number | null
           description?: string | null
           id?: string
+          max_attempts?: number
           max_concurrent_calls?: number | null
           name?: string
           organization_id?: string | null
@@ -256,43 +268,67 @@ export type Database = {
       }
       contacts: {
         Row: {
+          call_attempts: number
+          calls_connected: number
           company: string | null
           created_at: string
           email: string | null
+          emails_sent: number
           first_name: string
           id: string
+          last_activity: string | null
+          last_activity_at: string | null
           last_name: string | null
           notes: string | null
           organization_id: string | null
+          outcome: string | null
           phone: string | null
+          sms_sent: number
+          status: string
           tags: string[] | null
           updated_at: string
           user_id: string
         }
         Insert: {
+          call_attempts?: number
+          calls_connected?: number
           company?: string | null
           created_at?: string
           email?: string | null
+          emails_sent?: number
           first_name: string
           id?: string
+          last_activity?: string | null
+          last_activity_at?: string | null
           last_name?: string | null
           notes?: string | null
           organization_id?: string | null
+          outcome?: string | null
           phone?: string | null
+          sms_sent?: number
+          status?: string
           tags?: string[] | null
           updated_at?: string
           user_id: string
         }
         Update: {
+          call_attempts?: number
+          calls_connected?: number
           company?: string | null
           created_at?: string
           email?: string | null
+          emails_sent?: number
           first_name?: string
           id?: string
+          last_activity?: string | null
+          last_activity_at?: string | null
           last_name?: string | null
           notes?: string | null
           organization_id?: string | null
+          outcome?: string | null
           phone?: string | null
+          sms_sent?: number
+          status?: string
           tags?: string[] | null
           updated_at?: string
           user_id?: string
@@ -309,22 +345,91 @@ export type Database = {
       }
       organizations: {
         Row: {
+          address: string | null
+          business_days: number[] | null
+          business_hours_end: string | null
+          business_hours_start: string | null
+          business_industry: string | null
+          business_type: string | null
+          country: string | null
           created_at: string
+          dba_name: string | null
+          verification_status: string
+          ein: string | null
+          email: string | null
           id: string
+          legal_name: string | null
           name: string
+          phone: string | null
+          registration_number: string | null
+          rep_date_of_birth: string | null
+          rep_email: string | null
+          rep_full_name: string | null
+          rep_phone: string | null
+          rep_title: string | null
+          stripe_customer_id: string | null
+          subscription_status: string | null
+          timezone: string | null
           updated_at: string
+          website: string | null
         }
         Insert: {
+          address?: string | null
+          business_days?: number[] | null
+          business_hours_end?: string | null
+          business_hours_start?: string | null
+          business_industry?: string | null
+          business_type?: string | null
+          country?: string | null
           created_at?: string
+          dba_name?: string | null
+          ein?: string | null
+          email?: string | null
           id?: string
+          legal_name?: string | null
           name: string
+          verification_status?: string
+          phone?: string | null
+          registration_number?: string | null
+          rep_date_of_birth?: string | null
+          rep_email?: string | null
+          rep_full_name?: string | null
+          rep_phone?: string | null
+          rep_title?: string | null
+          stripe_customer_id?: string | null
+          subscription_status?: string | null
+          timezone?: string | null
           updated_at?: string
+          website?: string | null
         }
         Update: {
+          address?: string | null
+          business_days?: number[] | null
+          business_hours_end?: string | null
+          business_hours_start?: string | null
+          business_industry?: string | null
+          business_type?: string | null
+          country?: string | null
           created_at?: string
+          dba_name?: string | null
+          ein?: string | null
+          email?: string | null
           id?: string
+          legal_name?: string | null
           name?: string
+          verification_status?: string
+          phone?: string | null
+          registration_number?: string | null
+          rep_date_of_birth?: string | null
+          rep_email?: string | null
+          rep_full_name?: string | null
+          rep_phone?: string | null
+          rep_title?: string | null
+          stripe_customer_id?: string | null
+          subscription_status?: string | null
+          timezone?: string | null
           updated_at?: string
+          website?: string | null
         }
         Relationships: []
       }
@@ -336,8 +441,6 @@ export type Database = {
           id: string
           organization_id: string | null
           role: Database["public"]["Enums"]["user_role"]
-          stripe_customer_id: string | null
-          subscription_status: string | null
           updated_at: string
         }
         Insert: {
@@ -347,8 +450,6 @@ export type Database = {
           id: string
           organization_id?: string | null
           role?: Database["public"]["Enums"]["user_role"]
-          stripe_customer_id?: string | null
-          subscription_status?: string | null
           updated_at?: string
         }
         Update: {
@@ -358,13 +459,93 @@ export type Database = {
           id?: string
           organization_id?: string | null
           role?: Database["public"]["Enums"]["user_role"]
-          stripe_customer_id?: string | null
-          subscription_status?: string | null
           updated_at?: string
         }
         Relationships: [
           {
             foreignKeyName: "profiles_organization_id_fkey"
+            columns: ["organization_id"]
+            isOneToOne: false
+            referencedRelation: "organizations"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      sms_messages: {
+        Row: {
+          body: string | null
+          campaign_id: string | null
+          contact_id: string | null
+          created_at: string
+          delivered_at: string | null
+          direction: string
+          error_message: string | null
+          external_id: string | null
+          from_number: string | null
+          id: string
+          organization_id: string | null
+          sent_at: string | null
+          sms_metadata: Json | null
+          status: string
+          to_number: string | null
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          body?: string | null
+          campaign_id?: string | null
+          contact_id?: string | null
+          created_at?: string
+          delivered_at?: string | null
+          direction: string
+          error_message?: string | null
+          external_id?: string | null
+          from_number?: string | null
+          id?: string
+          organization_id?: string | null
+          sent_at?: string | null
+          sms_metadata?: Json | null
+          status?: string
+          to_number?: string | null
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          body?: string | null
+          campaign_id?: string | null
+          contact_id?: string | null
+          created_at?: string
+          delivered_at?: string | null
+          direction?: string
+          error_message?: string | null
+          external_id?: string | null
+          from_number?: string | null
+          id?: string
+          organization_id?: string | null
+          sent_at?: string | null
+          sms_metadata?: Json | null
+          status?: string
+          to_number?: string | null
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "sms_messages_campaign_id_fkey"
+            columns: ["campaign_id"]
+            isOneToOne: false
+            referencedRelation: "campaigns"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "sms_messages_contact_id_fkey"
+            columns: ["contact_id"]
+            isOneToOne: false
+            referencedRelation: "contacts"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "sms_messages_organization_id_fkey"
             columns: ["organization_id"]
             isOneToOne: false
             referencedRelation: "organizations"
@@ -444,6 +625,10 @@ export type Database = {
       }
       maybe_complete_campaign: {
         Args: { p_campaign_id: string }
+        Returns: undefined
+      }
+      update_contact_after_call: {
+        Args: { p_call_id: string }
         Returns: undefined
       }
     }

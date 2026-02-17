@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { createClient } from "@/lib/supabase/server";
+import { getAuthContext } from "@/lib/supabase/get-org-id";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -22,15 +22,12 @@ const statusVariant: Record<string, "default" | "secondary" | "outline" | "destr
 };
 
 export default async function CampaignsPage() {
-  const supabase = await createClient();
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
+  const { supabase, organizationId } = await getAuthContext();
 
   const { data: campaigns } = await supabase
     .from("campaigns")
     .select("id, name, status, total_contacts, calls_completed, scheduled_at, started_at, completed_at, created_at, voice_agents(name)")
-    .eq("user_id", user!.id)
+    .eq("organization_id", organizationId)
     .order("created_at", { ascending: false });
 
   return (
